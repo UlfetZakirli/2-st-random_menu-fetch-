@@ -1,45 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Menu from './Menu';
-import Categories from './Categories';
 import items from './data';
 
-const allcategories=['all',...new Set(items.map((item)=>item.category))];
-//console.log(allcategories);
 
 function App() {
-  const [menuItems,setMenuItems]=useState(items);
-  const[categories,setCategories]=useState(allcategories);
   const [product,setProduct]=useState('');
+
   const getProduct=()=>{
-    fetch('./src/data.js')
+    fetch('http://localhost:8000/products')
     .then(res=>res.json())
-  }
+    .then((data)=>{
 
-
-
-  const filterItems=(category)=>{
-    if(category==="all"){
-      setMenuItems(items);
-      return;
-
-    }
-    const newItems=items.filter((item)=>item.category===category);
-    setMenuItems(newItems);
+      let randomNum=Math.floor(Math.random()*data.length);
+      setProduct(data[randomNum]);
+    });
   };
 
+  useEffect(()=>{
+    getProduct();
+  },[]);
 
   return <main>
-    <section className='menu section'>
-      <div className='title'>
-        <h2>my Products</h2>
-      <button className='mb-4' onClick={getProduct}>Get Product</button>
-
-        <div className='underline'></div>
+<section className='menu section'>
+  <div className="title">
+    <h2>my Products</h2>
+    <div className="product">
+      <div className="btnContainer">
+        <button className='btn' onClick={getProduct}>Get Product</button>
       </div>
-  <Categories categories={categories} filterItems={filterItems}/>
-  <Menu items={menuItems}/>
-    </section>
-  </main>;
+    </div>
+    <div className="underline"></div>
+    <div className="col-md-2 mb-4">
+      <div className="card">
+        <img src={product.img} className="card-img-top" alt="" />
+        <div className="card-body">
+          <h5 className="card-title">${product.price}</h5>
+          <p className="card-text">
+            {product.desc}
+          </p>
+          <button className='btn btn-dark'>Buy Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  </main>
 }
 
 export default App;
